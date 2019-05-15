@@ -14,7 +14,7 @@ weight: 2
 
 In this section we will see how to extract tweets from Twitter's public API (Application Programming Interface).
 
-Please note that, through the procedurew that we will show you, you will be accessing:
+Please note that, through the procedure that we will show you, you will be accessing:
 
 1. Up to 3200 tweets from a public Twitter account (current *rtweet* documentation).
 2. Tweets containing a specific # and published up to 7 days before the data collection starts (current Twitter developer documentation).

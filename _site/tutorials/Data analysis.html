@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Data analysis | Stirling R for Heritage Training Workshop</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="Data analysis" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="R FOR HERITAGE: TRAINING WORKSHOP" />
+<meta property="og:description" content="R FOR HERITAGE: TRAINING WORKSHOP" />
+<link rel="canonical" href="http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis.html" />
+<meta property="og:url" content="http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis.html" />
+<meta property="og:site_name" content="Stirling R for Heritage Training Workshop" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-05-15T09:54:57+01:00" />
+<script type="application/ld+json">
+{"description":"R FOR HERITAGE: TRAINING WORKSHOP","@type":"BlogPosting","url":"http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis.html","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://avatars0.githubusercontent.com/u/20096949?s=200&v=4"}},"headline":"Data analysis","dateModified":"2019-05-15T09:54:57+01:00","datePublished":"2019-05-15T09:54:57+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/R_FOR_HERITAGE_TRAINING_WORKSHOP/assets/css/style.css?v=152e707b98563ac41bb0905e89682f8f24db64a4">
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/">Stirling R for Heritage Training Workshop</a></h1>
+        
+        
+          <img src="https://avatars0.githubusercontent.com/u/20096949?s=200&v=4" alt="Logo" />
+        
+
+        <p>tutorials for R training</p>
+
+        
+        <p class="view"><a href="https://github.com/IARHeritages/R_FOR_HERITAGE_TRAINING_WORKSHOP">View the Project on GitHub <small>IARHeritages/R_FOR_HERITAGE_TRAINING_WORKSHOP</small></a></p>
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h1 id="r-for-heritage-training-workshop">R FOR HERITAGE: TRAINING WORKSHOP</h1>
+
+<h2 id="15-may-2019-university-of-stirling">15 May 2019, University of Stirling</h2>
+
+<h4 id="sponsored-by-the-scottish-graduate-school-for-arts-and-humanities">Sponsored by the Scottish Graduate School for Arts and Humanities</h4>
+
+<h4 id="authors-marta-krzyzanska-martakrzyzanskastiracuk-and-dr-chiara-bonacchi-chiarabonacchistiracuk">Authors: Marta Krzyzanska (marta.krzyzanska@stir.ac.uk) and Dr Chiara Bonacchi (chiara.bonacchi@stir.ac.uk)</h4>
+
+<h4 id="part-3-data-analysis">Part 3: Data analysis</h4>
+
+<p>The next few sections of this training are partly based on the study published by Ben Marwick (2014), which included full documentation of the code that was used. In this study, Marwick analysed the content of the tweets containing a particular # with techniques including term frequencies, term associations, sentiment analysis and topic modelling. We further developed these analytical routines, applying them to Facebook data, as part of a study on the Heritage of Brexit (Bonacchi, Altaweel, Krzyzanska 2018).</p>
+
+<p>Now, we will apply some of the techniques mentioned above to an anonymised dataset of tweets containing #hadrianswall that were extracted via streaming in 2017 and 2018. To do that, we will need the text mining library <em>tm</em> (the documentation for it can be found here https://cran.r-project.org/web/packages/tm/tm.pdf) and few other libraries that enable text manipulation and visualisation.</p>
+
+<h2 id="workspace-preparation">Workspace preparation</h2>
+
+<p>First, install all these libraries and then load them into the R workspace:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#Install the packages:</span><span class="w">
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"tm"</span><span class="p">)</span><span class="w">
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"stringr"</span><span class="p">)</span><span class="w">
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"wordcloud"</span><span class="p">)</span><span class="w">
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"rtweet"</span><span class="p">)</span><span class="w">
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"rJava"</span><span class="p">)</span><span class="w">
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"SnowballC"</span><span class="p">)</span><span class="w">
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"NLP"</span><span class="p">)</span><span class="w">
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"pkggraph"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Load the packages</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tm</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">stringr</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">wordcloud</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">rtweet</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">rJava</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">SnowballC</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">NLP</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pkggraph</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Set your working directory:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">setwd</span><span class="p">(</span><span class="s2">"/Users/yourusername/Documents/Rheritage"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Then save the .csv file containing tweets that feature <em>#hadrianswall</em> in your working directory and load the data into your R workspace with the following command:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">d</span><span class="o">&lt;-</span><span class="n">read.csv</span><span class="p">(</span><span class="s2">"data.csv"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>To get an idea about the structure of the table, you can use the <em>str()</em> function, which is designed to show the internal structure of an R object:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">str</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>'data.frame':	4651 obs. of  22 variables:
+ $ id_str                               : Factor w/ 4651 levels "anonymised_id(1001899)",..: 4288 2429 2726 2974 1702 2882 1121 4594 3548 1563 ...
+ $ text                                 : Factor w/ 1810 levels "'Golden Frontier' - beautiful shot of #HadriansWall, captured by anonymised_user(6878864) at dawn today - #phot"| __truncated__,..: 470 142 702 1502 1801 701 466 1463 1125 456 ...
+ $ created_at                           : Factor w/ 4645 levels "2017-09-13 09:55:54",..: 3832 4573 4607 4580 3874 4608 4561 4082 3829 4081 ...
+ $ user.description                     : Factor w/ 1788 levels "","'Courage doesn't always roar. Sometimes courage is the little voice at the end of the day that says, 'I'll try "| __truncated__,..: 244 1301 95 1308 248 95 1263 1738 478 1738 ...
+ $ user.followers_count                 : int  1308 86 128 4531 698 128 688 11 163 11 ...
+ $ user.friends_count                   : int  959 151 591 2748 1557 591 769 46 580 46 ...
+ $ user.statuses_count                  : int  2362 119 72 13651 2446 72 587 12 170 12 ...
+ $ in_reply_to_status_id_str            : Factor w/ 33 levels "anonymised_id(1465387)",..: NA NA NA NA NA NA NA NA NA NA ...
+ $ is_quote_status                      : Factor w/ 2 levels "false","true": 1 1 1 1 1 1 1 1 1 1 ...
+ $ quoted_status_id_str                 : Factor w/ 98 levels "anonymised_id(1360931)",..: NA NA NA NA NA NA NA NA NA NA ...
+ $ quoted_status.text                   : Factor w/ 99 levels "","#hadrianswall #nationaltrail around #Housesteads - you can really see the lumps and bumps of the Vicus (civilia"| __truncated__,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ quoted_status.user.description       : Factor w/ 80 levels "","A collection of original illustrations, art and photography from talented local artists available as stunning l"| __truncated__,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ retweeted_status.id_str              : Factor w/ 654 levels "9.39892617223e+17",..: NA NA NA NA NA NA NA NA 393 NA ...
+ $ retweeted_status.text                : Factor w/ 654 levels "","'Golden Frontier' - beautiful shot of #HadriansWall, captured by anonymised_user(6878864) at dawn today - #phot"| __truncated__,..: 1 1 1 1 1 1 1 1 236 1 ...
+ $ retweeted_status.user.description    : Factor w/ 190 levels "","'Give me a camera' #canon; budding #yamaha alto player, #photostreak 1090 consecutive days. anonymised_user(869"| __truncated__,..: 1 1 1 1 1 1 1 1 28 1 ...
+ $ retweeted_status.user.followers_count: int  NA NA NA NA NA NA NA NA 4297 NA ...
+ $ retweeted_status.user.friends_count  : int  NA NA NA NA NA NA NA NA 2486 NA ...
+ $ retweeted_status.user.statuses_count : int  NA NA NA NA NA NA NA NA 4844 NA ...
+ $ user.id                              : Factor w/ 1868 levels "anonymised_user(1001787)",..: 272 1308 115 1717 555 115 203 1521 873 1521 ...
+ $ in_reply_to_user_id                  : Factor w/ 56 levels "","anonymised_user(1426941)",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ quoted_status.user.id                : Factor w/ 74 levels "","anonymised_user(1235832)",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ retweeted_status.user.id             : Factor w/ 188 levels "","anonymised_user(1065525)",..: 1 1 1 1 1 1 1 1 96 1 ...
+</code></pre></div></div>
+
+<p>As you can see above, the data you imported from the .csv file is a data frame consisting of 4651 observations (tweets) and 22 variables that store information about each tweet in 22 distinct columns. The names of the columns are flagged with the $ sign, and they are followed by the information about the type of data they are storing. Since the data frame is too big to visualise it in its entirety, let’s have a look at the text of the first three tweets and their creation date (respectively the second and  the third columns of the data frame):</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">d</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">),</span><span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="o">:</span><span class="m">3</span><span class="p">)]</span><span class="w">
+</span></code></pre></div></div>
+
+<table>
+<thead><tr><th scope="col">text</th><th scope="col">created_at</th></tr></thead>
+<tbody>
+	<tr><td>Hadrian's Wall. An oldie this one, and suspect there€™s more snow out there today! #hadrianswall #winter #northumberland #landscapephotography https://t.co/8NO7JzRUNs                                                                                              </td><td>2018-03-02 09:11:27                                                                                                                                                                                                                                                    </td></tr>
+	<tr><td>A sight to behold! sycamore gap, part of Hadrian€™s Wall. #sycamoregap #hadrianswall #northumberland #uk #landscapephotography #tree #sycamoretree #robinhoodprinceofthieves #payinghomage #picturesque #crowdsurfphotos #crowdsurfphotography https://t.co/U5ZdbwWVEd</td><td>2018-03-26 11:45:55                                                                                                                                                                                                                                                    </td></tr>
+	<tr><td>Preparing my bag for Hadrians Wall coast to coast walk. 4 weeks to go!
+65L too much?  #hadrianswall #hiking #Northumberland #solway #wallsend #UNICEF #hikingadventures https://t.co/QXxKY9seal                                                                       </td><td>2018-03-27 12:38:05                                                                                                                                                                                                                                                    </td></tr>
+</tbody>
+</table>
+
+<p>You can have a look at any other subset of the data, by manipulating the numbers used to define relevant rows and columns or by using the names of the relevant columns.</p>
+
+<h2 id="time-series">Time series</h2>
+
+<p>Before we start analysing the text of the tweets, let’s get some basic and contextual information about our data. We already know, that there are 4651 tweets in the dataset.</p>
+
+<p>We can also have a look at when the tweets were published. To do that, let’s inspect the <em>created_at column</em> more closely:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">head</span><span class="p">(</span><span class="n">d</span><span class="o">$</span><span class="n">created_at</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<ol class="list-inline">
+	<li>2018-03-02 09:11:27</li>
+	<li>2018-03-26 11:45:55</li>
+	<li>2018-03-27 12:38:05</li>
+	<li>2018-03-26 16:52:02</li>
+	<li>2018-03-03 12:34:27</li>
+	<li>2018-03-27 12:40:01</li>
+</ol>
+
+<p>This column stores the dates and times when the tweets were published, in a standardised format. We can use it to plot the time series of the tweets, using the <em>ts_plot</em> function from the <em>rtweet</em> library (a time series is a series of data points listed or graphed in a time order):</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ts_plot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="o">=</span><span class="s2">"days"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="../images/output_13_1.png" alt="png" /></p>
+
+<p>As you can see above, the dataset contains tweets streamed in two separate batches. The first batch was collected between September and December 2017, and the second one in February and March 2018. Note that by stating that results should be plotted <em>by=”days”</em> we specified that we wanted the desired interval of time to be days.</p>
+
+<p>If you want you can save the resulting plot as a .pdf, using the following command (check that the file appeared in your working directory and you can open it):</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dev.print</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span><span class="s2">"time_series.pdf"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="users-analysis">Users analysis</h2>
+
+<p>We can also have a look at the number of unique users who posted the tweets. First, we create a variable called unique users, where we store the unique numbers corresponding to anonymised user ids, which can be obtained by using the function <em>unique()</em>:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">unique_users</span><span class="o">&lt;-</span><span class="w"> </span><span class="n">unique</span><span class="p">(</span><span class="n">d</span><span class="o">$</span><span class="n">user.id</span><span class="p">)</span><span class="w"> </span><span class="c1"># Function unique() returns all the unique values from the list provided as an argument.</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Then, we use the <em>length()</em> function to get the number of unique users:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">length</span><span class="p">(</span><span class="n">unique_users</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>1868</p>
+
+<p>There were 1868 unique users. This number is lower than the number of tweets. Let’s have a closer look at the frequency of tweets per user. To do that, let’s transform the column with the anonymised user ids into a table:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">users</span><span class="o">&lt;-</span><span class="n">table</span><span class="p">(</span><span class="n">d</span><span class="o">$</span><span class="n">user.id</span><span class="p">)</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">users</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>anonymised_user(1001787)  anonymised_user(101639) anonymised_user(1019551)
+                       1                        3                        1
+anonymised_user(1023010) anonymised_user(1024187) anonymised_user(1024525)
+                       1                        1                        1
+</code></pre></div></div>
+
+<p>As you can see above, the table shows the serial number corresponding to a certain anonymised user id, and the number of tweets s/he tweeted. However, this is not a very effective way of presenting data, so let’s transform the data contained in the variable <em>users</em> into a data frame:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">users</span><span class="o">&lt;-</span><span class="n">as.data.frame</span><span class="p">(</span><span class="n">users</span><span class="p">)</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">users</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<table>
+<thead><tr><th scope="col">Var1</th><th scope="col">Freq</th></tr></thead>
+<tbody>
+	<tr><td>anonymised_user(1001787)</td><td>1                       </td></tr>
+	<tr><td>anonymised_user(101639) </td><td>3                       </td></tr>
+	<tr><td>anonymised_user(1019551)</td><td>1                       </td></tr>
+	<tr><td>anonymised_user(1023010)</td><td>1                       </td></tr>
+	<tr><td>anonymised_user(1024187)</td><td>1                       </td></tr>
+	<tr><td>anonymised_user(1024525)</td><td>1                       </td></tr>
+</tbody>
+</table>
+
+<p>This looks better, but we also want to order users by frequency of tweeting  (i.e. the number of tweets per user in the dataset), from those who tweeted less to those who tweeted more. Let’s do that and inspect the tail of the new data frame to visualise the users who tweeted the most:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">users</span><span class="o">&lt;-</span><span class="n">users</span><span class="p">[</span><span class="n">with</span><span class="p">(</span><span class="n">users</span><span class="p">,</span><span class="n">order</span><span class="p">(</span><span class="n">Freq</span><span class="p">)),]</span><span class="w">
+</span><span class="n">tail</span><span class="p">(</span><span class="n">users</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<table>
+<thead><tr><th></th><th scope="col">Var1</th><th scope="col">Freq</th></tr></thead>
+<tbody>
+	<tr><th scope="row">961</th><td>anonymised_user(5633442)</td><td> 89                     </td></tr>
+	<tr><th scope="row">753</th><td>anonymised_user(4722486)</td><td>103                     </td></tr>
+	<tr><th scope="row">1717</th><td>anonymised_user(9224355)</td><td>124                     </td></tr>
+	<tr><th scope="row">383</th><td>anonymised_user(2851416)</td><td>136                     </td></tr>
+	<tr><th scope="row">649</th><td>anonymised_user(4223981)</td><td>142                     </td></tr>
+	<tr><th scope="row">458</th><td>anonymised_user(32252)  </td><td>369                     </td></tr>
+</tbody>
+</table>
+
+<p>In the code above, the function with() is used to re-order the rows in the data frame (hence it is placed as the first element in the square brackets, which is used to access the rows). The <em>with()</em> function takes two arguments: the data by which to re-order (the data frame called <em>users</em>), and the function used to re-order them (in this case it is <em>frequency</em>, as we reorder from the lowest value to the highest). To save the table with the frequencies of the tweets per user, you can write it into a csv file:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">write.csv</span><span class="p">(</span><span class="n">users</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"users_frequency.csv"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="hashtags-analysis">Hashtags analysis</h2>
+
+<p>Let’s also extract the hashtags that are present in the dataset. Knowing what hashtags are there, can give us the initial information about the themes present in our data. To extract hashtags from the text of the tweets, we will use the pre-defined <em>str_extract_all</em> function from the <em>stringr</em> library:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">hashtags</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">str_extract_all</span><span class="p">(</span><span class="n">d</span><span class="o">$</span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="s2">"#\\w+"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>This function takes as the first argument the text from which we want to extract the hashtags, and  a <em>regular expression</em> as the second argument. This expression tells R to extract contents starting from and including # up to a whitespace (<em>w+</em>).</p>
+
+<p>Regular expressions and functions such as <em>str_extract_all</em> are useful for text manipulation. If, later on, you want to have a look at the full range of text manipulation functions and regular expressions available, see https://www.rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf.</p>
+
+<p>Have a look at the format in which the hashtags are provided:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">head</span><span class="p">(</span><span class="n">hashtags</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<ol>
+	<li><ol class="list-inline">
+	<li>'#hadrianswall'</li>
+	<li>'#winter'</li>
+	<li>'#northumberland'</li>
+	<li>'#landscapephotography'</li>
+</ol>
+</li>
+	<li><ol class="list-inline">
+	<li>'#sycamoregap'</li>
+	<li>'#hadrianswall'</li>
+	<li>'#northumberland'</li>
+	<li>'#uk'</li>
+	<li>'#landscapephotography'</li>
+	<li>'#tree'</li>
+	<li>'#sycamoretree'</li>
+	<li>'#robinhoodprinceofthieves'</li>
+	<li>'#payinghomage'</li>
+	<li>'#picturesque'</li>
+	<li>'#crowdsurfphotos'</li>
+	<li>'#crowdsurfphotography'</li>
+</ol>
+</li>
+	<li><ol class="list-inline">
+	<li>'#hadrianswall'</li>
+	<li>'#hiking'</li>
+	<li>'#Northumberland'</li>
+	<li>'#solway'</li>
+	<li>'#wallsend'</li>
+	<li>'#UNICEF'</li>
+	<li>'#hikingadventures'</li>
+</ol>
+</li>
+	<li><ol class="list-inline">
+	<li>'#hadrianswall'</li>
+	<li>'#Hadrianswall'</li>
+</ol>
+</li>
+	<li><ol class="list-inline">
+	<li>'#Snow'</li>
+	<li>'#RomanPower'</li>
+	<li>'#HadrianWall'</li>
+	<li>'#Roman'</li>
+	<li>'#Britain'</li>
+	<li>'#Arrago'</li>
+	<li>'#Mansio'</li>
+	<li>'#AquaCalidae'</li>
+	<li>'#Iesso'</li>
+	<li>'#Tarraconensis'</li>
+	<li>'#Barcino'</li>
+	<li>'#Baetulo'</li>
+</ol>
+</li>
+	<li><ol class="list-inline">
+	<li>'#hadrianswall'</li>
+	<li>'#hiking'</li>
+	<li>'#Northumberland'</li>
+	<li>'#solway'</li>
+	<li>'#wallsend'</li>
+	<li>'#UNICEF'</li>
+	<li>'#hikingadventures'</li>
+</ol>
+</li>
+</ol>
+
+<p>The texts were originally provided as a vector, and the extracted hashtags are also returned as a vector.</p>
+
+<p>As you can see, each element in this vector, contains a vector of hashtags that appeared in a given tweet. To simplify this vector of vectors into a simple list of hashtags, we can <em>unlist</em> it and have a look at the first few #:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">hashtags</span><span class="o">&lt;-</span><span class="n">unlist</span><span class="p">(</span><span class="n">hashtags</span><span class="p">)</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">hashtags</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<ol class="list-inline">
+	<li>'#hadrianswall'</li>
+	<li>'#winter'</li>
+	<li>'#northumberland'</li>
+	<li>'#landscapephotography'</li>
+	<li>'#sycamoregap'</li>
+	<li>'#hadrianswall'</li>
+</ol>
+
+<p>Now we have a simple list of all the hashtags that appear in the tweets. Let’s find out how many times a # was used and how many unique hashtags there are in the tweets:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">length</span><span class="p">(</span><span class="n">hashtags</span><span class="p">)</span><span class="w">
+</span><span class="nf">length</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">hashtags</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>11577</p>
+
+<p>882</p>
+
+<p>##### Q1.Try to make a frequency table for hashtags. Which hashtags feature most frequently?
+ The code you can use to produce the table is given at the end of this tutorial.</p>
+
+<h2 id="document-term-matrix">Document-term matrix</h2>
+
+<p>In this section, we will take a closer look at the content of the tweets. To do this, we will transform the texts of the tweets into a document-term matrix. This is a special type of data structure which stores the texts of the tweets in a way that allows them to be easily queried and analysed.</p>
+
+<p>First, extract the texts from the data frame and store them as a simple vector of texts:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">texts</span><span class="o">&lt;-</span><span class="n">iconv</span><span class="p">(</span><span class="n">d</span><span class="o">$</span><span class="n">text</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># d$text is wrapped in the iconv() function, which transforms the utf-8 enconding into a format readeble by R.</span><span class="w">
+</span><span class="c1"># in most cases it is not needed, but if you encounter errors related to utf-8 encoding, simply use this function.</span><span class="w">
+
+</span><span class="n">head</span><span class="p">(</span><span class="n">texts</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<ol class="list-inline">
+	<li>Hadrian€™s Wall. An oldie this one, and suspect there€™s more snow out there today! #hadrianswall #winter #northumberland #landscapephotography https://t.co/8NO7JzRUNs</li>
+	<li>A sight to behold! sycamore gap, part of Hadrian€™s Wall. #sycamoregap #hadrianswall #northumberland #uk #landscapephotography #tree #sycamoretree #robinhoodprinceofthieves #payinghomage #picturesque #crowdsurfphotos #crowdsurfphotography https://t.co/U5ZdbwWVEd</li>
+	<li>&lt;span style=white-space:pre-wrap&gt;Preparing my bag for Hadrians Wall coast to coast walk. 4 weeks to go!\n65L too much?  #hadrianswall #hiking #Northumberland #solway #wallsend #UNICEF #hikingadventures https://t.co/QXxKY9seal&lt;/span&gt;</li>
+	<li>The Hadrianic bath house at Chester€™s Fort sits next to #hadrianswall on the North Tyne river extended over time with heavy buttressed latrine #Hadrianswall https://t.co/rcJsn7f5nw</li>
+	<li>Winter on Hadrian's Wall. How did Romans cope with snow? \nhttps://t.co/g0ZtEDO3Te\n#Snow #RomanPower #HadrianWall #Roman #Britain #Arrago #Mansio #AquaCalidae #Iesso #Tarraconensis #Barcino #Baetulo https://t.co/h4nSJRTrW4</li>
+	<li>&lt;span style=white-space:pre-wrap&gt;Preparing my bag for Hadrians Wall coast to coast walk. 4 weeks to go!\n65L too much?  #hadrianswall #hiking #Northumberland #solway #wallsend #UNICEF #hikingadventures https://t.co/2WPcSfRROP https://t.co/3nYYjGamwF&lt;/span&gt;</li>
+</ol>
+
+<p>Then, transform the texts into a <em>corpus</em>. A <em>corpus</em> is a collection of documents (in our case each tweet is a document) that can be read and manipulated using the <em>tm</em> library:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Corpus</span><span class="p">(</span><span class="n">VectorSource</span><span class="p">(</span><span class="n">texts</span><span class="p">))</span><span class="w">
+</span><span class="c1">#interpret all elements of the vector composed of texts as a document and create a corpus with those documents.</span><span class="w">
+</span><span class="n">a</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;&lt;SimpleCorpus&gt;&gt;
+Metadata:  corpus specific: 1, document level (indexed): 0
+Content:  documents: 4651
+</code></pre></div></div>
+
+<p>Now that we have a corpus of tweets, let’s use the <em>tm</em> library to clean our textual data and prepare it for the analysis. We will use <em>tm_map</em>, which is an interface useful to apply transformation functions to corpora. First, we will modify all the words in the corpus so they are in the lowercase:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">tolower</span><span class="p">)</span><span class="w">
+</span><span class="c1">#here the tm_map interface is used together with the function tolower() to change all terms to the lowercase</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Get rid of all punctuation:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">removePunctuation</span><span class="p">)</span><span class="w">
+</span><span class="c1">#here the tm_map interface is used together with the function removePunctuation() to remove punctuation from the documents</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Remove numbers:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">removeNumbers</span><span class="p">)</span><span class="w">
+</span><span class="c1">#here the tm_map interface is used together with the function removeNumbers to remove all the numbers from the documents</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Remove English stopwords. Stopwords are those words that are not particularly meaningful on their own, in a certain language. Examples of English stopwords are: “a”, “the”, “in”.</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">removeWords</span><span class="p">,</span><span class="w"> </span><span class="n">stopwords</span><span class="p">(</span><span class="s2">"english"</span><span class="p">))</span><span class="w">
+</span><span class="c1">#here the tm_map interface is used together with the function removeWords to remove English stopwords</span><span class="w">
+</span><span class="c1">#function stopwords produces the list of stopwords in the language specified as an argument</span><span class="w">
+</span><span class="c1">#you can use this function also to remove other words that may create noise in the data</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Finally, stem all the words in the corpus. Stemming is a procedure used to remove word endings and ensure that only the root of a word is retained. This leaves us with ‘a single token that indicates different forms of the same word that have a common meaning’ (Marwick 2014: 83):</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">stemDocument</span><span class="p">,</span><span class="w"> </span><span class="n">language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"english"</span><span class="p">)</span><span class="w">
+</span><span class="c1">#here the tm_map interface is used together with the function stemDocument() to tokenize words</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now the corpus is ready to be transformed into a document-term matrix (dtm). In this case, during the transformation we want to keep only the tokens that are longer than 3 letters:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dtm</span><span class="w">  </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">TermDocumentMatrix</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">minWordLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">))</span><span class="w">
+</span><span class="c1"># (minWordLength = 3) means that the minimum length of the terms we are keeping is 3 letters</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Inspect the dtm to get an idea of how the data is structured:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">inspect</span><span class="p">(</span><span class="n">dtm</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">])</span><span class="w">
+</span><span class="c1">#inspect() allows you to 'display detailed information on a corpus, a term-document matrix, or a text document'</span><span class="w">
+</span><span class="c1"># [1:10,1:10] allows you to specify that you want the first 10 terms and 10 documents to be displayed</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;&lt;TermDocumentMatrix (terms: 10, documents: 10)&gt;&gt;
+Non-/sparse entries: 26/74
+Sparsity           : 74%
+Maximal term length: 20
+Weighting          : term frequency (tf)
+Sample             :
+                      Docs
+Terms                  1 10 2 3 4 5 6 7 8 9
+  hadrianÃ             1  0 1 0 0 1 0 0 0 0
+  hadrianswal          1  1 1 1 2 0 1 1 1 1
+  httpstconojzrun      1  0 0 0 0 0 0 0 0 0
+  landscapephotographi 1  0 1 0 0 0 0 0 0 0
+  northumberland       1  0 1 1 0 0 1 2 0 0
+  oldi                 1  0 0 0 0 0 0 0 0 0
+  one                  1  0 0 0 0 0 0 0 0 0
+  snow                 1  0 0 0 0 2 0 0 0 0
+  suspect              1  0 0 0 0 0 0 0 0 0
+  thereÃ               1  0 0 0 0 0 0 0 0 0
+</code></pre></div></div>
+
+<p>In the document-term matrix, each row is a different term that appears in the corpus and each column is a different document contained in the corpus. The numbers indicate how many times a certain term appears in a certain document.</p>
+
+<h3 id="term-frequencies">Term frequencies</h3>
+
+<p>Now we can start carrying out some simple analyses on our dtm. First, let’s find out what the terms with the highest frequency (those that recur the most) are, by using the function <em>findFreqTerms()</em>:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">findFreqTerms</span><span class="p">(</span><span class="n">dtm</span><span class="p">,</span><span class="w"> </span><span class="n">lowfreq</span><span class="o">=</span><span class="m">400</span><span class="p">)</span><span class="w">
+</span><span class="c1">#Get the terms that feature at least 400 times</span><span class="w">
+</span></code></pre></div></div>
+
+<ol class="list-inline">
+	<li>'hadrianswal'</li>
+	<li>'northumberland'</li>
+	<li>'wall'</li>
+	<li>'roman'</li>
+	<li>'nationaltrail'</li>
+	<li>'anonymisedus'</li>
+	<li>'along'</li>
+	<li>'crag'</li>
+	<li>'morn'</li>
+	<li>'archaeolog'</li>
+</ol>
+
+<p>Now, let’s get the terms that feature between 200 and 400 times:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">findFreqTerms</span><span class="p">(</span><span class="n">dtm</span><span class="p">,</span><span class="w"> </span><span class="n">highfreq</span><span class="o">=</span><span class="m">400</span><span class="p">,</span><span class="n">lowfreq</span><span class="o">=</span><span class="m">200</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<ol class="list-inline">
+	<li>'today'</li>
+	<li>'hadrian'</li>
+	<li>'walk'</li>
+	<li>'fort'</li>
+	<li>'mile'</li>
+	<li>'found'</li>
+	<li>'day'</li>
+	<li>'lough'</li>
+	<li>'section'</li>
+	<li>'housestead'</li>
+	<li>'milecastl'</li>
+	<li>'near'</li>
+	<li>'beauti'</li>
+	<li>'romanbritain'</li>
+	<li>'frontier'</li>
+	<li>'vindolanda'</li>
+	<li>'hadrianswallÃ'</li>
+	<li>'westtoeast'</li>
+</ol>
+
+<p>And the terms that feature between 100 and 200 times:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">findFreqTerms</span><span class="p">(</span><span class="n">dtm</span><span class="p">,</span><span class="w"> </span><span class="n">highfreq</span><span class="o">=</span><span class="m">200</span><span class="p">,</span><span class="n">lowfreq</span><span class="o">=</span><span class="m">100</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<ol class="list-inline">
+	<li>'one'</li>
+	<li>'snow'</li>
+	<li>'hadrian'</li>
+	<li>'north'</li>
+	<li>'time'</li>
+	<li>'build'</li>
+	<li>'amp'</li>
+	<li>'love'</li>
+	<li>'nlandnp'</li>
+	<li>'view'</li>
+	<li>'weather'</li>
+	<li>'trigpoint'</li>
+	<li>'stone'</li>
+	<li>'see'</li>
+	<li>'great'</li>
+	<li>'histori'</li>
+	<li>'built'</li>
+	<li>'walltown'</li>
+	<li>'just'</li>
+	<li>'want'</li>
+	<li>'new'</li>
+	<li>'good'</li>
+	<li>'steel'</li>
+	<li>'show'</li>
+	<li>'now'</li>
+	<li>'sewingshield'</li>
+	<li>'still'</li>
+	<li>'altar'</li>
+	<li>'look'</li>
+	<li>'can'</li>
+	<li>'turret'</li>
+	<li>'ditch'</li>
+	<li>'head'</li>
+	<li>'carlisl'</li>
+	<li>'west'</li>
+	<li>'light'</li>
+	<li>'scene'</li>
+	<li>'httpsÃ'</li>
+	<li>'snowi'</li>
+	<li>'inÃ'</li>
+	<li>'httpstcÃ'</li>
+	<li>'hotbank'</li>
+	<li>'misti'</li>
+	<li>'crisp'</li>
+	<li>'excav'</li>
+	<li>'autumn'</li>
+	<li>'fine'</li>
+	<li>'frosti'</li>
+</ol>
+
+<p>As you can see, the most frequent terms largely overlap with the most frequent hashtags, but there are also other tokens associated for example with weather, excavations and archaeological sites.</p>
+
+<h3 id="term-associations">Term associations</h3>
+
+<p>To start exploring quantitatively the context in which these frequently recurring terms feature, we can have a look at the terms that are most strongly associated with them. For example to find associations for the term ‘frontier’ type:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">findAssocs</span><span class="p">(</span><span class="n">dtm</span><span class="p">,</span><span class="w"> </span><span class="s2">"frontier"</span><span class="p">,</span><span class="w"> </span><span class="m">0.30</span><span class="p">)</span><span class="w">
+</span><span class="c1">#find terms that are associated with the term 'frontier', with correlation &gt;0.3</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>$frontier</strong> =</p>
+<dl class="dl-horizontal">
+	<dt>golden</dt>
+		<dd>0.8</dd>
+	<dt>northernmost</dt>
+		<dd>0.8</dd>
+	<dt>dawn</dt>
+		<dd>0.79</dd>
+	<dt>break</dt>
+		<dd>0.76</dd>
+	<dt>empir</dt>
+		<dd>0.69</dd>
+	<dt>httpstcopaÃ</dt>
+		<dd>0.49</dd>
+	<dt>inÃ</dt>
+		<dd>0.46</dd>
+	<dt>scene</dt>
+		<dd>0.4</dd>
+	<dt>snowi</dt>
+		<dd>0.4</dd>
+	<dt>roman</dt>
+		<dd>0.36</dd>
+	<dt>romanbritain</dt>
+		<dd>0.33</dd>
+</dl>
+
+<p>Try inspecting different terms. The number given in the formula above (0.3), indicates the minimum strength of correlation between the terms in the corpus of documents (i.e. how often they occur together) and can vary between 0 and 1. You can adjust this number as necessary (the lower the number, the lower the minimum strength of the association, and the more terms will be displayed).</p>
+
+<p>You can also display the corpus of texts as a word cloud and save it in your workspace:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wordcloud</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">max.word</span><span class="o">=</span><span class="m">200</span><span class="p">,</span><span class="n">colors</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s2">"red"</span><span class="p">,</span><span class="s2">"lightgreen"</span><span class="p">,</span><span class="s2">"black"</span><span class="p">,</span><span class="s2">"lightblue"</span><span class="p">))</span><span class="w">
+</span><span class="n">dev.print</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="s2">"terms_wordcloud.pdf"</span><span class="p">)</span><span class="w">
+</span><span class="c1">#create a word cloud from the corpus (a)</span><span class="w">
+</span><span class="c1">#it will have a max of 200 words</span><span class="w">
+</span><span class="c1">#to create the word cloud, use the colours red, lightgreen, black, lightblue</span><span class="w">
+</span><span class="c1">#then save the wordcloud to your workspace</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>png:</strong> 2</p>
+
+<p><img src="../images/output_64_1.png" alt="png" /></p>
+
+<p>Finally, save your document-term matrix as an R object:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">save</span><span class="p">(</span><span class="n">dtm</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="s2">"dtm.R"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We can also create and inspect the document-term matrix from the description of the user profiles. To do this, first get unique user descriptions and store this data in the <em>user_desc</em> variable:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">users_desc</span><span class="o">&lt;-</span><span class="n">unique</span><span class="p">(</span><span class="n">d</span><span class="o">$</span><span class="n">user.description</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h5 id="q2-create-a-document-term-matrix-from-user-descriptions-and-explore-the-data-as-we-have-done-above">Q2. Create a document-term matrix from user descriptions and explore the data as we have done above.</h5>
+<p>The code is given at the end of this tutorial.</p>
+
+<p>**The operations of manipulations and data analysis we have seen are a good springboard for more sophisticated quantitative analysis such as cluster analysis, topic modelling and social network analysis. They are also a really useful way to explore the content of large data sets and make decisions on what to analyse qualitatively and how. **</p>
+
+<p>Well done! You have reached the end of the training. We hope you enjoyed it and found enough food for thought.</p>
+
+<h1 id="solutions">Solutions</h1>
+
+<h5 id="q1-try-to-make-a-frequency-table-for-hashtags-which-hashtags-feature-most-frequently">Q1: Try to make a frequency table for hashtags. Which hashtags feature most frequently?</h5>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">hashtags</span><span class="o">&lt;-</span><span class="n">table</span><span class="p">(</span><span class="n">hashtags</span><span class="p">)</span><span class="w">
+</span><span class="n">hashtags</span><span class="o">&lt;-</span><span class="n">as.data.frame</span><span class="p">(</span><span class="n">hashtags</span><span class="p">)</span><span class="w">
+</span><span class="n">hashtags</span><span class="o">&lt;-</span><span class="n">hashtags</span><span class="p">[</span><span class="n">with</span><span class="p">(</span><span class="n">hashtags</span><span class="p">,</span><span class="n">order</span><span class="p">(</span><span class="n">Freq</span><span class="p">)),]</span><span class="w">
+</span><span class="n">tail</span><span class="p">(</span><span class="n">hashtags</span><span class="p">)</span><span class="w"> </span><span class="c1">## remember that the tail() function allows you to visualise the last few rows of a dataset.</span><span class="w">
+</span></code></pre></div></div>
+
+<table>
+<thead><tr><th></th><th scope="col">hashtags</th><th scope="col">Freq</th></tr></thead>
+<tbody>
+	<tr><th scope="row">560</th><td>#Northumberland</td><td> 333           </td></tr>
+	<tr><th scope="row">335</th><td>#Hadrianswall  </td><td> 334           </td></tr>
+	<tr><th scope="row">42</th><td>#Archaeology   </td><td> 399           </td></tr>
+	<tr><th scope="row">521</th><td>#nationaltrail </td><td>1217           </td></tr>
+	<tr><th scope="row">336</th><td>#HadriansWall  </td><td>1591           </td></tr>
+	<tr><th scope="row">333</th><td>#hadrianswall  </td><td>2354           </td></tr>
+</tbody>
+</table>
+
+<h4 id="q2-create-a-document-term-matrix-from-user-descriptions-and-explore-the-data-as-we-have-done-above-1">Q2: Create a document-term matrix from user descriptions and explore the data as we have done above.</h4>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Corpus</span><span class="p">(</span><span class="n">VectorSource</span><span class="p">(</span><span class="n">users_desc</span><span class="p">))</span><span class="w">
+</span><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">tolower</span><span class="p">)</span><span class="w">
+</span><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">removePunctuation</span><span class="p">)</span><span class="w">
+</span><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">removeNumbers</span><span class="p">)</span><span class="w">
+</span><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">removeWords</span><span class="p">,</span><span class="w"> </span><span class="n">stopwords</span><span class="p">(</span><span class="s2">"english"</span><span class="p">))</span><span class="w">
+</span><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tm_map</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">stemDocument</span><span class="p">,</span><span class="w"> </span><span class="n">language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"english"</span><span class="p">)</span><span class="w">
+</span><span class="n">dtm.users</span><span class="w">  </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">TermDocumentMatrix</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">minWordLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">))</span><span class="w">
+</span><span class="n">save</span><span class="p">(</span><span class="n">dtm.users</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="s2">"dtm_users.R"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">findFreqTerms</span><span class="p">(</span><span class="n">dtm.users</span><span class="p">,</span><span class="w"> </span><span class="n">lowfreq</span><span class="o">=</span><span class="m">100</span><span class="p">)</span><span class="w">
+</span><span class="n">findFreqTerms</span><span class="p">(</span><span class="n">dtm.users</span><span class="p">,</span><span class="w"> </span><span class="n">lowfreq</span><span class="o">=</span><span class="m">50</span><span class="p">,</span><span class="w"> </span><span class="n">highfreq</span><span class="o">=</span><span class="m">100</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<ol class="list-inline">
+	<li>'archaeolog'</li>
+	<li>'histori'</li>
+	<li>'love'</li>
+</ol>
+
+<ol class="list-inline">
+	<li>'photograph'</li>
+	<li>'follow'</li>
+	<li>'photographi'</li>
+	<li>'life'</li>
+	<li>'archaeolog'</li>
+	<li>'interest'</li>
+	<li>'wall'</li>
+	<li>'time'</li>
+	<li>'world'</li>
+	<li>'writer'</li>
+	<li>'live'</li>
+	<li>'northumberland'</li>
+	<li>'book'</li>
+	<li>'walk'</li>
+	<li>'travel'</li>
+	<li>'roman'</li>
+	<li>'author'</li>
+	<li>'lover'</li>
+	<li>'art'</li>
+	<li>'artist'</li>
+	<li>'music'</li>
+	<li>'tweet'</li>
+	<li>'anonymisedus'</li>
+	<li>'view'</li>
+	<li>'work'</li>
+	<li>'write'</li>
+	<li>'fan'</li>
+	<li>'\u0081'</li>
+</ol>
+
+<h2 id="references">References</h2>
+
+<p>Bonacchi, C., Altaweel, M., Krzyzanska, M. (2018) The heritage of Brexit: Roles of the past in the construction of political identities through social media. <em>Journal of Social Archaeology</em> 18(2): 174-192. DOI: 10.1177/1469605318759713.</p>
+
+<p>Marwick, B. (2014) Discovery of Emergent Issues and Controversies in Anthropology Using Text Mining, Topic Modeling, and Social Network Analysis of Microblog Content. <em>Data Mining Applications with R</em>. Amsterdam: Academic Press, Elsevier, pp. 63-93.</p>
+
+
+      </section>
+      <footer>
+        
+        <p>This project is maintained by <a href="https://github.com/IARHeritages">IARHeritages</a></p>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/R_FOR_HERITAGE_TRAINING_WORKSHOP/assets/js/scale.fix.js"></script>
+    
+  </body>
+</html>

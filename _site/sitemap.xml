@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis%20-%20bonus%20exercise.html</loc>
+<lastmod>2019-05-15T09:54:57+01:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis.html</loc>
+<lastmod>2019-05-15T09:54:57+01:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20collection.html</loc>
+<lastmod>2019-05-15T09:54:57+01:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Introduction%20to%20R.html</loc>
+<lastmod>2019-05-15T09:54:57+01:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/</loc>
+</url>
+</urlset>

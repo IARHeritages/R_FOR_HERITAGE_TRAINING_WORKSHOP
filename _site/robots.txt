@@ -1,0 +1,1 @@
+Sitemap: http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/sitemap.xml

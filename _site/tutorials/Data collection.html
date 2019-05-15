@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Data collection | Stirling R for Heritage Training Workshop</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="Data collection" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="R FOR HERITAGE: TRAINING WORKSHOP" />
+<meta property="og:description" content="R FOR HERITAGE: TRAINING WORKSHOP" />
+<link rel="canonical" href="http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20collection.html" />
+<meta property="og:url" content="http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20collection.html" />
+<meta property="og:site_name" content="Stirling R for Heritage Training Workshop" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-05-15T09:54:57+01:00" />
+<script type="application/ld+json">
+{"description":"R FOR HERITAGE: TRAINING WORKSHOP","@type":"BlogPosting","url":"http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20collection.html","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://avatars0.githubusercontent.com/u/20096949?s=200&v=4"}},"headline":"Data collection","dateModified":"2019-05-15T09:54:57+01:00","datePublished":"2019-05-15T09:54:57+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20collection.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/R_FOR_HERITAGE_TRAINING_WORKSHOP/assets/css/style.css?v=152e707b98563ac41bb0905e89682f8f24db64a4">
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/">Stirling R for Heritage Training Workshop</a></h1>
+        
+        
+          <img src="https://avatars0.githubusercontent.com/u/20096949?s=200&amp;v=4" alt="Logo">
+        
+
+        <p>tutorials for R training</p>
+
+        
+        <p class="view"><a href="https://github.com/IARHeritages/R_FOR_HERITAGE_TRAINING_WORKSHOP">View the Project on GitHub <small>IARHeritages/R_FOR_HERITAGE_TRAINING_WORKSHOP</small></a></p>
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h1 id="r-for-heritage-training-workshop">R FOR HERITAGE: TRAINING WORKSHOP</h1>
+
+<h2 id="15-may-2019-university-of-stirling">15 May 2019, University of Stirling</h2>
+
+<h4 id="sponsored-by-the-scottish-graduate-school-for-arts-and-humanities">Sponsored by the Scottish Graduate School for Arts and Humanities</h4>
+
+<h4 id="authors-marta-krzyzanska-martakrzyzanskastiracuk-and-dr-chiara-bonacchi-chiarabonacchistiracuk">Authors: Marta Krzyzanska (marta.krzyzanska@stir.ac.uk) and Dr Chiara Bonacchi (chiara.bonacchi@stir.ac.uk)</h4>
+
+<h4 id="part-2-data-collection">Part 2: Data collection</h4>
+
+<p>In this section we will see how to extract tweets from Twitter’s public API (Application Programming Interface).</p>
+
+<p>Please note that, through the procedurew that we will show you, you will be accessing:</p>
+
+<ol>
+  <li>Up to 3200 tweets from a public Twitter account (current <em>rtweet</em> documentation).</li>
+  <li>Tweets containing a specific # and published up to 7 days before the data collection starts (current Twitter developer documentation).</li>
+  <li>A small random sample of tweets containing a specific term amongst those that are published live during a specific time interval (current <em>rtweet</em> documentation).</li>
+</ol>
+
+<p>These limits are constantly updated by social media companies, so make sure you check the relevant documentation each time.</p>
+
+<h2 id="creating-an-api-access-token">Creating an API access token</h2>
+
+<p>Before starting, define your working directory:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">setwd</span><span class="p">(</span><span class="s2">"/Users/yourusername/Documents/Rheritage"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>To get data from Twitter, we will be using the <em>rtweet</em> library. In programming, libraries are collections of pre-defined routines that a program can use. In other words, they provide additional functions. In the case of Free and Open Source Software like R, these functions can be written and shared by anyone and published as packages. To use a library, you need to install it first:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">install.packages</span><span class="p">(</span><span class="s2">"rtweet"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>A new window should appear, prompting you to choose a cran mirror. Choose one of those located in the UK and double click on it. You may need to wait a moment before the package is installed. Then, load the library:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">rtweet</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>To download data from Twitter we will need ‘an access token’, which is like a special key allowing us to access Twitter’s public API. There is a function in the <em>rtweet</em> library that allows you to create an access token, called <em>create_token</em>. To check how it works type:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">?</span><span class="n">create_token</span><span class="w">
+</span></code></pre></div></div>
+
+<p>As you can see, the function requires 5 arguments: the name of the Twitter app (application) created by the user, the consumer key, the consumer secret, the access token and the access secret. To get all this information, you need to create a Twitter app in this way:</p>
+
+<ul>
+  <li>
+    <p>Apply for a developer account going to this link: https://developer.twitter.com/en/apply/user.</p>
+  </li>
+  <li>
+    <p>Log in to your Twitter account and make sure that you have provided your phone number as part of your profile information.</p>
+  </li>
+  <li>
+    <p>Wait for an email confirming that your account has been approved.</p>
+  </li>
+  <li>
+    <p>Go to https://apps.twitter.com/ and click on the <em>create New App</em> button.</p>
+  </li>
+  <li>
+    <p>Under application details, enter app name (e.g. <em>token_1</em> or anything else that is not already taken), app description (e.g. <em>token for R</em>) and website (e.g. <em>http://example.com</em>). As Callback URL enter: <em>http://127.0.0.1:1410</em>; accept the Developer Agreement and click on the <em>Create</em> button.</p>
+  </li>
+  <li>
+    <p>Click the <em>modify app permissions</em> button and under <em>Access</em> choose: <em>Read, Write and Access direct messages</em>; then click <em>Update Settings</em></p>
+  </li>
+  <li>
+    <p>Now go to the <em>Keys and Access Tokens</em> tab to find your consumer key and consumer secret and provide those and your app name as arguments in the function <em>create_token</em> (enter them as strings, in quotation marks!):</p>
+  </li>
+</ul>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">token</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">create_token</span><span class="p">(</span><span class="w">
+  </span><span class="n">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"app_name"</span><span class="p">,</span><span class="w">
+  </span><span class="n">consumer_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"your_consumer_key"</span><span class="p">,</span><span class="w">
+  </span><span class="n">consumer_secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"your_consumer_secret"</span><span class="p">,</span><span class="w">
+  </span><span class="n">access_token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"your_access_token"</span><span class="p">,</span><span class="w">
+  </span><span class="n">access_secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"your_access_secret"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now save your newly-created token as an R object file, so that you can re-use it later:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">save</span><span class="p">(</span><span class="n">token</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"token.R"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">load</span><span class="p">(</span><span class="s2">"token.R"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="user-timeline-extraction">User timeline extraction</h2>
+
+<p>We are ready to access Twitter’s API and extract tweets. There are various ways of extracting tweets.</p>
+
+<p>For example, we can extract all the tweets posted by a specific, public account. To do this, we will use the <em>get_timeline</em> function from the <em>rtweet</em> library. To find out what the function does and what information we need to feed into it, type:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">?</span><span class="n">get_timeline</span><span class="w">
+</span></code></pre></div></div>
+
+<p>This should open a browser window with documentation about the function. From this documentation, we learn that the function can return tweets posted either by a given user or by the accounts followed by that user. If we are interested in what a user has been tweeting, we will keep the default setting of the home argument to false. (Under <em>usage</em>, you can see what the default settings of a parameter is. If default is what you want, you do not have to include that parameter).</p>
+
+<p> </p>
+
+<p>The <em>Arguments</em> section tells you what arguments you need to define:</p>
+
+<ul>
+  <li>Screen name of the user, for example “<a href="https://github.com/MicroPasts" class="user-mention">@MicroPasts</a>” (it needs to be input as a string i.e. in quotation marks).</li>
+  <li>The number of tweets to return (input as numeric value, so without quotation marks).</li>
+  <li>As token, we will use our newly created token stored in the variable with the same name.</li>
+  <li>We can keep the other arguments as ‘default’, so we do not need to include them.</li>
+</ul>
+
+<p>The function should return a data frame, which we will store in the variable tweets:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">tweets</span><span class="o">&lt;-</span><span class="n">get_timeline</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">"@MicroPasts"</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">=</span><span class="m">100</span><span class="p">,</span><span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Show the top of the data frame, displaying only the first 5 columns:</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">tweets</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">)])</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="search-by-hashtag">Search by hashtag</h2>
+
+<p>If, instead, we want to search for tweets containing specific terms or hashtags, we can use the <em>search_tweets()</em> function. <br>
+For example, to search for tweets with <strong>“#EdSciFest”</strong>:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">tweets2</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">search_tweets</span><span class="p">(</span><span class="s2">"#EdSciFest"</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Show the top of the data frame, displaying only the first 5 columns:</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">tweets2</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">)])</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Now have a look at all the names of the columns in your data frame</span><span class="w">
+</span><span class="c1"># This will give you an idea of the information you are extracting together with the text of tweets</span><span class="w">
+</span><span class="n">colnames</span><span class="p">(</span><span class="n">tweets2</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="data-anonymisation">Data anonymisation</h2>
+
+<p>Immediately after collecting Twitter data, we proceed with anonymising it, for ethical reasons and to protect the human subjects involved.</p>
+
+<p>In particular, we will anonymise the identification numbers of tweets, and either drop or anonymise user names and user identification numbers. To demonstrate how this can be done, we will use the second dataset we extracted (tweets2).</p>
+
+<p>To anonymise <em>tweet ids</em>, substitute the original ids, with random numbers. First, find out how many random numbers are needed, by checking the length of the unique entries in the column containing the <em>status id</em>:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">n</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">length</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">tweets2</span><span class="o">$</span><span class="n">status_id</span><span class="p">))</span><span class="w">
+</span><span class="n">n</span><span class="w">
+</span></code></pre></div></div>
+
+<p>R has a number of functions that can generate random numbers. To anonymise our data, we will use the one called <em>sample()</em>. As the first argument, this function takes the list of numbers from which to sample; as the second argument, it takes the number of samples needed (in this case equal to n); and as the third argument, it asks you to specify TRUE or FALSE depending on whether you want to allow the same number to be drawn more than once or not (in our case, we don’t want to and we give FALSE as argument):</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># This generates a sample of n random numbers drawing from integers ranging from 1 to 10000</span><span class="w">
+</span><span class="c1"># It does so without replacement, so that the same number does not appear in the sample more than once</span><span class="w">
+</span><span class="n">anonymised_id</span><span class="o">&lt;-</span><span class="n">sample</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">10000</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">replace</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+</span><span class="c1"># Now have a look at your anonymised ids</span><span class="w">
+</span><span class="n">anonymised_id</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now get the list of unique ids from the original dataset:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">status_id</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">unique</span><span class="p">(</span><span class="n">tweets2</span><span class="o">$</span><span class="n">status_id</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Make a data frame with the unique tweet ids in one column and the random numbers in the other and inspect it:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">randuser</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cbind</span><span class="p">(</span><span class="n">status_id</span><span class="p">,</span><span class="n">anonymised_id</span><span class="p">)</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">randuser</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now we can merge this data frame with the original dataset, by matching up the anonymised ids with the corresponding ids of the tweets:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rand.df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="n">randuser</span><span class="p">,</span><span class="w"> </span><span class="n">tweets2</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="o">=</span><span class="s2">"status_id"</span><span class="p">)</span><span class="w">
+</span><span class="c1"># This function merges two data frames by a specific column, in this case status_id</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Inspect the first few rows of the data frame, to see that there is a new column with anonymised tweet ids:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">head</span><span class="p">(</span><span class="n">rand.df</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">)])</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Since we have the column with the anonymised ids, we can drop the one with the original ids. To drop the column, simply set the values of the column as NULL, and inspect the top of the data frame to see that the column has in fact been dropped:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rand.df</span><span class="o">$</span><span class="n">status_id</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kc">NULL</span><span class="w"> </span><span class="c1"># This gets rid of the status_id column</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">rand.df</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">)])</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We also need to anonymise the columns containing user ids and screen names. To do this, you can either substitute these ids and names with random numbers, or simply drop the columns altogether:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rand.df</span><span class="o">$</span><span class="n">user_id</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kc">NULL</span><span class="w"> </span><span class="c1"># This gets rid of the status_id column</span><span class="w">
+</span><span class="n">rand.df</span><span class="o">$</span><span class="n">screen_name</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kc">NULL</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">rand.df</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">)])</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Finally, to fully anonymise our dataset, we need to get rid of the usernames contained in the text of the tweets. To do that, we can either substitute the handles with random numbers, or simply delete them altogether.</p>
+
+<p>To delete the handles from the text, you can use the <em>gsub()</em> function. As a first argument, this function takes the pattern we want to delete, which may be a specific string. For example, to delete <a href="https://github.com/MicroPasts" class="user-mention">@MicroPasts</a> handles, we would use ‘<a href="https://github.com/MicroPasts" class="user-mention">@MicroPasts</a>’ as the first argument. To delete all the handles present in the text of the tweets, we will use a <em>regular expression</em>, which tells R to delete all the characters starting from and including ‘@’, to the first whitespace, denoted as ‘w+’ (regular expressions will be further discussed in the ‘Data Analysis’ section of this tutorial). The second argument in the <em>gsub()</em> function indicates what we want to replace the pattern with. Since we just want to delete the handles, we put an empty string here. The third argument is the list of the texts from which we want to delete the handles:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rand.df</span><span class="o">$</span><span class="n">text</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">gsub</span><span class="p">(</span><span class="s2">"@\\w+"</span><span class="p">,</span><span class="s2">""</span><span class="p">,</span><span class="n">iconv</span><span class="p">(</span><span class="n">rand.df</span><span class="o">$</span><span class="n">text</span><span class="p">))</span><span class="w">
+</span><span class="c1"># rand.df$text is wrapped in the iconv() function, which transforms the utf-8 enconding into a format readeble by R.</span><span class="w">
+</span><span class="c1"># in most cases it is not needed, but if you encounter errors related to utf-8 encoding, simply use this function.</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">rand.df</span><span class="o">$</span><span class="n">text</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Check how the data frame looks like after the anonymisation:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">head</span><span class="p">(</span><span class="n">rand.df</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">)])</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now, check which other columns in the data frame contain personal identifiers:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">colnames</span><span class="p">(</span><span class="n">rand.df</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>It looks like there are a few of those columns (reply_to_status_id, reply_to_user_id, etc). Anonymise and/or remove all of those as well, as shown above.</p>
+
+<h2 id="streaming-tweets">Streaming tweets</h2>
+
+<p>A third option to extract tweets is ‘streaming’, which means that you collect tweets as they are published by people during a certain time interval.</p>
+
+<p>To do this, use the function <em>stream_tweets()</em>. For example, to stream tweets containing the term ‘bigdata’, provide ‘bigdata’ as first argument. As second argument, give the time interval during which you want the streaming to take place. So, to stream tweets containing the term ‘bigdata’ for 30 seconds, type:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">tweets3</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">stream_tweets</span><span class="p">(</span><span class="s2">"bigdata"</span><span class="p">,</span><span class="w"> </span><span class="n">timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span><span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Now have a look at the kind of data you have collected</span><span class="w">
+</span><span class="n">colnames</span><span class="p">(</span><span class="n">tweets3</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+
+      </section>
+      <footer>
+        
+        <p>This project is maintained by <a href="https://github.com/IARHeritages">IARHeritages</a></p>
+        
+        <p><small>Hosted on GitHub Pages — Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/R_FOR_HERITAGE_TRAINING_WORKSHOP/assets/js/scale.fix.js"></script>
+    
+  </body>
+</html>

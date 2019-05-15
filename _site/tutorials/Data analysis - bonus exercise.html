@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Data analysis bonus exercise | Stirling R for Heritage Training Workshop</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="Data analysis bonus exercise" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="R FOR HERITAGE: TRAINING WORKSHOP" />
+<meta property="og:description" content="R FOR HERITAGE: TRAINING WORKSHOP" />
+<link rel="canonical" href="http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis%20-%20bonus%20exercise.html" />
+<meta property="og:url" content="http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis%20-%20bonus%20exercise.html" />
+<meta property="og:site_name" content="Stirling R for Heritage Training Workshop" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-05-15T09:54:57+01:00" />
+<script type="application/ld+json">
+{"description":"R FOR HERITAGE: TRAINING WORKSHOP","@type":"BlogPosting","url":"http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis%20-%20bonus%20exercise.html","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://avatars0.githubusercontent.com/u/20096949?s=200&v=4"}},"headline":"Data analysis bonus exercise","dateModified":"2019-05-15T09:54:57+01:00","datePublished":"2019-05-15T09:54:57+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/tutorials/Data%20analysis%20-%20bonus%20exercise.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/R_FOR_HERITAGE_TRAINING_WORKSHOP/assets/css/style.css?v=152e707b98563ac41bb0905e89682f8f24db64a4">
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/R_FOR_HERITAGE_TRAINING_WORKSHOP/">Stirling R for Heritage Training Workshop</a></h1>
+        
+        
+          <img src="https://avatars0.githubusercontent.com/u/20096949?s=200&v=4" alt="Logo" />
+        
+
+        <p>tutorials for R training</p>
+
+        
+        <p class="view"><a href="https://github.com/IARHeritages/R_FOR_HERITAGE_TRAINING_WORKSHOP">View the Project on GitHub <small>IARHeritages/R_FOR_HERITAGE_TRAINING_WORKSHOP</small></a></p>
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h1 id="r-for-heritage-training-workshop">R FOR HERITAGE: TRAINING WORKSHOP</h1>
+
+<h2 id="15-may-2019-university-of-stirling">15 May 2019, University of Stirling</h2>
+
+<h4 id="sponsored-by-the-scottish-graduate-school-for-arts-and-humanities">Sponsored by the Scottish Graduate School for Arts and Humanities</h4>
+
+<h4 id="authors-marta-krzyzanska-martakrzyzanskastiracuk-and-dr-chiara-bonacchi-chiarabonacchistiracuk">Authors: Marta Krzyzanska (marta.krzyzanska@stir.ac.uk) and Dr Chiara Bonacchi (chiara.bonacchi@stir.ac.uk)</h4>
+
+<h4 id="part-4-data-analysis---bonus-exercise">Part 4: Data analysis - bonus exercise</h4>
+
+<p>In the previous tutorials, you have learnt some fundamental skills and routines to explore and analyse social media data using R. This is an optional tutorial that aims to introduce a more advanced method that can be useful in text analysis: cluster analysis.</p>
+
+<h2 id="cluster-analysis">Cluster analysis</h2>
+
+<p>Cluster analysis can be used to get a better idea of the distance that there is between different terms contained in a corpus of texts. This kind of analysis can give us more nuanced information about the extent to which certain terms appear in proximity or not.</p>
+
+<p>Cluster analysis involves the calculation of the distances between all the tokens (terms) in the dtm. Drawing on the calculation of these distances, hierarchical clustering methods can be used to classify the tokens into nested groups, which can then be visualised as a dendrogram.</p>
+
+<p>To carry out a cluster analysis, set your working directory, install and load the required libraries, and load the dtm you saved previously, into the workspace:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">setwd</span><span class="p">(</span><span class="s2">"/Users/yourusername/Documents/Rheritage"</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tm</span><span class="p">)</span><span class="w">
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"pvclust"</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pvclust</span><span class="p">)</span><span class="w">
+</span><span class="n">load</span><span class="p">(</span><span class="s2">"dtm.R"</span><span class="p">)</span><span class="w"> </span><span class="c1"># Load the dtm</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now, inspect the dtm to remind yourself of how it is structured:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">inspect</span><span class="p">(</span><span class="n">dtm</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;&lt;TermDocumentMatrix (terms: 4167, documents: 4651)&gt;&gt;
+Non-/sparse entries: 50493/19330224
+Sparsity           : 100%
+Maximal term length: 27
+Weighting          : term frequency (tf)
+Sample             :
+                Docs
+Terms            1217 1221 143 150 156 162 177 178 179 78
+  along             0    0   0   0   0   0   0   0   0  0
+  anonymisedus      0    1   0   1   0   0   1   0   0  1
+  archaeolog        0    0   0   0   0   0   0   0   0  0
+  crag              0    0   0   0   0   0   0   0   0  0
+  hadrianswal       1    1   1   1   1   1   1   1   1  1
+  morn              0    0   0   0   0   0   0   0   0  0
+  nationaltrail     0    0   0   0   0   0   0   0   0  0
+  northumberland    1    0   0   1   0   1   0   1   0  0
+  roman             0    0   0   0   0   0   0   0   0  1
+  wall              0    0   0   0   0   0   0   0   0  1
+</code></pre></div></div>
+
+<p>As you can see, there are 4167 terms across 4651 documents, with a very high percentage of sparse terms. Sparsity refers to the distribution of terms across the corpus of documents, and more specifically to the proportion of the documents in which each the term does not appear at all (i.e. the value in the dtm = 0), which in this case is rounded up to 100%. If a given term appears only in one document, or in very few documents in the corpus, it is a sparse term. Removing sparse terms gets rid of the noise created by the terms that occur only incidentally. It also makes the clusters easier to visualise and analyse, by reducing the number of terms that are displayed on the dendrogram. Therefore, before starting to run the cluster analysis, we need to remove sparse terms.</p>
+
+<p>To do that, we will use the <em>removeSparseTerms()</em> function from the <em>tm</em> library. This function takes only two arguments: the dtm from which to remove the sparse terms and the maximum allowed sparsity from the range between 0 to 1 (but excluding 0 and 1):</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dtm.sp</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">removeSparseTerms</span><span class="p">(</span><span class="n">dtm</span><span class="p">,</span><span class="w"> </span><span class="n">sparse</span><span class="o">=</span><span class="m">0.97</span><span class="p">)</span><span class="w">
+</span><span class="c1"># This removes from the dtm all the terms that have sparsity &gt; 0.97</span><span class="w">
+</span><span class="c1"># It means that only the terms that are absent from less than 97% of the documents are kept</span><span class="w">
+</span><span class="c1"># In other words, it means that we are keeping the terms that appear in at least 3% of the documents in the corpus</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now inspect the dtm, without the sparse terms:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dtm.sp</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;&lt;TermDocumentMatrix (terms: 41, documents: 4651)&gt;&gt;
+Non-/sparse entries: 20090/170601
+Sparsity           : 89%
+Maximal term length: 14
+Weighting          : term frequency (tf)
+</code></pre></div></div>
+
+<p>The maximum sparsity level allowed is arbitrary and can be changed according to the requirements of the analysis. In this case, we chose to set the maximum level of sparsity so that there are less than 50 terms left in the matrix.</p>
+
+<p>We can now start with the analysis. Firstly, we need to transform our data into a format that can be used as an input in the cluster analysis. To do this, scale and transpose the dtm, using the <em>scale()</em> and <em>t()</em> functions, and inspect the results:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dtm.sp.df.sc.t</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">scale</span><span class="p">(</span><span class="n">dtm.sp</span><span class="p">))</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">dtm.sp.df.sc.t</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<table>
+<thead><tr><th></th><th scope="col">hadrianswal</th><th scope="col">northumberland</th><th scope="col">today</th><th scope="col">wall</th><th scope="col">hadrian</th><th scope="col">walk</th><th scope="col">fort</th><th scope="col">roman</th><th scope="col">nationaltrail</th><th scope="col">anonymisedus</th><th scope="col">...</th><th scope="col">turret</th><th scope="col">west</th><th scope="col">scene</th><th scope="col">hadrianswall</th><th scope="col">in</th><th scope="col">httpstc</th><th scope="col">hotbank</th><th scope="col">westtoeast</th><th scope="col">crisp</th><th scope="col">frosti</th></tr></thead>
+<tbody>
+	<tr><th scope="row">1</th><td> 3.0040623</td><td> 3.0040623</td><td> 3.0040623</td><td> 3.0040623</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>...       </td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td><td>-0.3247635</td></tr>
+	<tr><th scope="row">2</th><td> 3.5153554</td><td> 3.5153554</td><td>-0.2775281</td><td> 3.5153554</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>...       </td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td><td>-0.2775281</td></tr>
+	<tr><th scope="row">3</th><td> 2.6503566</td><td> 2.6503566</td><td>-0.3681051</td><td> 2.6503566</td><td> 2.6503566</td><td> 2.6503566</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>...       </td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td></tr>
+	<tr><th scope="row">4</th><td> 5.0800590</td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td><td> 2.4097716</td><td>-0.2605158</td><td> 2.4097716</td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td><td>...       </td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td><td>-0.2605158</td></tr>
+	<tr><th scope="row">5</th><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td><td> 2.6809803</td><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td><td> 5.5736170</td><td>-0.2116563</td><td>-0.2116563</td><td>...       </td><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td><td>-0.2116563</td></tr>
+	<tr><th scope="row">6</th><td> 2.6503566</td><td> 2.6503566</td><td>-0.3681051</td><td> 2.6503566</td><td> 2.6503566</td><td> 2.6503566</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>...       </td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td><td>-0.3681051</td></tr>
+</tbody>
+</table>
+
+<p>As you can see, the ‘transposition’ simply switched the rows with the columns. ‘Scaling’ centres and rescales the values, based on the mean and the standard deviation of the frequencies of all the terms in the corpus. It’s a simple trick that preserves the proportional differences between the values of the frequency of different terms in each document, but it makes the results easier to compute.</p>
+
+<p>Now we can compute the clusters using the <em>pvclust()</em> function:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fit</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">pvclust</span><span class="p">(</span><span class="n">dtm.sp.df.sc.t</span><span class="p">,</span><span class="n">nboot</span><span class="o">=</span><span class="m">50</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># The above computes the clusters of the terms present in the corpus</span><span class="w">
+</span><span class="c1"># The first argument is a matrix with each column storing terms and rows storing individual documents. The values represent relative frequencies</span><span class="w">
+
+</span><span class="c1"># The nboot argument defines the number of bootstrap replications</span><span class="w">
+</span><span class="c1"># In this case it was set to a relatively low number (50), to enable the completion of the analysis during the tutorial</span><span class="w">
+</span><span class="c1"># Usually it is good practice to set a higher number here (default is 1000)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Bootstrap (r = 0.5)... Done.
+Bootstrap (r = 0.6)... Done.
+Bootstrap (r = 0.7)... Done.
+Bootstrap (r = 0.8)... Done.
+Bootstrap (r = 0.9)... Done.
+Bootstrap (r = 1.0)... Done.
+Bootstrap (r = 1.1)... Done.
+Bootstrap (r = 1.2)... Done.
+Bootstrap (r = 1.3)... Done.
+Bootstrap (r = 1.4)... Done.
+</code></pre></div></div>
+
+<p>The code above uses bootstrapping to estimate the uncertainty of the clusters. Bootstrapping involves generating a number of random samples of documents from the data (in this case 50 samples, as nboot=50), and then replicating the cluster analysis on each of those samples. Then, the probability of each cluster (p-value) is calculated based on the number of times it appears in the bootstrap replicates.</p>
+
+<p>Here it is important to note, while concepts such as bootstrapping may sound complicated at first, you don’t need to understand all the maths behind them in detail. You just need to know what they do and how you can use them in the analysis.</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plot</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span><span class="w"> </span><span class="n">cex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.6</span><span class="p">,</span><span class="w"> </span><span class="n">cex.pv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.4</span><span class="p">,</span><span class="w"> </span><span class="n">col.pv</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">main</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="n">xlab</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="n">sub</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># This plots the hierarchical clusters (fit)</span><span class="w">
+</span><span class="c1"># The cex and cex.pv arguments define the size of the labels (smaller value=smaller size)</span><span class="w">
+</span><span class="c1"># The col.pv argument defines the colours of the p-values of the clusters</span><span class="w">
+</span><span class="c1"># The main argument defines the title of the dendrogram</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="../images/output_13_0.png" alt="png" /></p>
+
+<p>The small numbers at the top of every cluster indicate the extent to which the clusters are supported by the data, in other words the probability of each cluster based on bootstrapping. The higher the values, the higher certainty that the terms form a cluster.</p>
+
+<p>Save the plot:</p>
+
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dev.print</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="s2">"cluster_analysis.pdf"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>** Congratulations you have completed the bonus exercise!**</p>
+
+<p><em>There is a number of other techniques that can help you explore social media data and which can be implemented in R. These include, for example, social network analysis and topic modelling. While we don’t cover them in this tutorial, there is plenty of documentation about these methods freely available on the internet. The skills learned in this tutorial should make it easier to understand this kind of documentation, and hopefully enable you to explore it on your own.</em></p>
+
+
+      </section>
+      <footer>
+        
+        <p>This project is maintained by <a href="https://github.com/IARHeritages">IARHeritages</a></p>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/R_FOR_HERITAGE_TRAINING_WORKSHOP/assets/js/scale.fix.js"></script>
+    
+  </body>
+</html>

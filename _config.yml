@@ -15,11 +15,12 @@
 # in the templates via {{ site.myvariable }}.
 title: Stirling R for Heritage Training Workshop
 email: dejp3@cam.ac.uk
-description: >- # This site will provide training material for a training workshop on R.
+description: >- # This site will provide training material for a training workshop on R stats.
+  Held at Stirling University.
 baseurl: "/R_FOR_HERITAGE_TRAINING_WORKSHOP" # the subpath of your site, e.g. /blog
 url: "https://IARHeritages.github.io"
-twitter_username: 
-github_username:  
+twitter_username: IARHeritages
+github_username:  IARHeritages
 logo: https://avatars0.githubusercontent.com/u/20096949?s=200&v=4
 workshop_date: 2019-05-15
 # Build settings

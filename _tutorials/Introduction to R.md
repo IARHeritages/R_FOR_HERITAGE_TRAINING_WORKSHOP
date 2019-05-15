@@ -268,8 +268,8 @@ rbind(applications,developers)
 
 <table>
 <tbody>
-	<tr><th scope=row>applications</th><td>transcription </td><td>georeferencing</td><td>photomasking  </td><td>photo-tagging </td><td>video-tagging </td></tr>
-	<tr><th scope=row>developers</th><td>Daniel        </td><td>Dan           </td><td>Andy          </td><td>Adi           </td><td>Chiara        </td></tr>
+	<tr><th scope="row">applications</th><td>transcription </td><td>georeferencing</td><td>photomasking  </td><td>photo-tagging </td><td>video-tagging </td></tr>
+	<tr><th scope="row">developers</th><td>Daniel        </td><td>Dan           </td><td>Andy          </td><td>Adi           </td><td>Chiara        </td></tr>
 </tbody>
 </table>
 

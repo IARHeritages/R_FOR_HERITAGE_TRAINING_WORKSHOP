@@ -62,7 +62,7 @@ a
 
 This should print the value of *a*, which is 2. 
 
-In programming, these 'atomic' elements that can only hold one value at a time are called **scalars**. They are the smallest building blocks from which it is possible to create more complex data. To find out the kind of value held by a scalar, use the command class(). For example, let's check the mode of the scalar *2*:
+In programming, these 'atomic' elements that can only hold one value at a time are called **scalars**. They are the smallest building blocks from which it is possible to create more complex data. To find out the kind of value held by a scalar, use the command class(). For example, let's check the type of the scalar *2*:
 
 
 ```R
@@ -131,7 +131,7 @@ class(dt_c)
 'character'
 
 
-'Character' is another common type of data, which represents either a single character or multiple characters. In programming, character values are also commonly called **strings**. Strings can be used to store textual data, such as the text of the tweets. To assign a string value to a variable, you need to put the variable in the double quotation marks. For example, create a variable called *tweet* and assign the text "this is my tweet" to it:
+'Character' is another common type of scalar, which represents either a single character or multiple characters. In programming, character values are also commonly called **strings**. Strings can be used to store textual data, such as the text of the tweets. To assign a string value to a variable, you need to put the variable in the double quotation marks. For example, create a variable called *tweet* and assign the text "this is my tweet" to it:
 
 
 ```R

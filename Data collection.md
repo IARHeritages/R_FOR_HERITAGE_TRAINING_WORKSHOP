@@ -57,11 +57,13 @@ As you can see, the function requires 5 arguments: the name of the Twitter app (
 
 - Wait for an email confirming that your account has been approved.
 
-- Go to https://apps.twitter.com/ and click on the *create New App* button.
+- Go to https://apps.twitter.com/ and click on the *+create App* button.
 
-- Under application details, enter app name (e.g. *token_1* or anything else that is not already taken), app description (e.g. *token for R*) and website (e.g. *http://example.com*). As Callback URL enter: *http://127.0.0.1:1410*; accept the Developer Agreement and click on the *Create* button.
+- Make a note of API Key and API Secret Key.
 
-- Click the *modify app permissions* button and under *Access* choose: *Read, Write and Access direct messages*; then click *Update Settings*
+- Click on *App Setting* and: enter app description (e.g. *token for R*).
+
+- Click  *edit app permissions* button and choose: *Read + Write + Direct messages*; then click *Save*
 
 - Now go to the *Keys and Access Tokens* tab to find your consumer key and consumer secret and provide those and your app name as arguments in the function *create_token* (enter them as strings, in quotation marks!):
 

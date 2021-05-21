@@ -65,14 +65,14 @@ As you can see, the function requires 5 arguments: the name of the Twitter app (
 
 - Click  *edit app permissions* button and choose: *Read + Write + Direct messages*; then click *Save*
 
-- Now go to the *Keys and Access Tokens* tab to find your consumer key and consumer secret and provide those and your app name as arguments in the function *create_token* (enter them as strings, in quotation marks!):
+- Now go to the *Keys and Access Tokens* tab to find your access token and access secret and provide those and your app name as arguments in the function *create_token* (enter them as strings, in quotation marks!):
 
 
 ```R
 token <- create_token(
   app = "app_name",
-  consumer_key = "your_consumer_key",
-  consumer_secret = "your_consumer_secret",
+  consumer_key = "your_API_key",
+  consumer_secret = "your_API_secret_key",
   access_token = "your_access_token",
   access_secret = "your_access_secret")
 ```
